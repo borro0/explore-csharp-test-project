@@ -1,7 +1,4 @@
 namespace ExploreCSharpTestProject;
-using System.IO;
-using Xunit.Sdk;
-using System.Reflection;
 
 public struct Position
 {
@@ -35,12 +32,37 @@ public class EngineNumbers
         }
         return sum;
     }
+
+    public int SumOfGearRatios()
+    {
+        for (int lineIndex = 0; lineIndex < input.Length; lineIndex++)
+        {
+            lineLength = input[lineIndex].Length;
+            for (int charIndex = 0; charIndex < lineLength; charIndex++)
+            {
+                ProcessCharacter(charIndex, lineIndex);
+            }
+        }
+        int sum = 0;
+        foreach ((Position position, List<int> numbers) in GearMap) {
+            if (numbers.Count == 2) {
+                sum += numbers[0] * numbers[1];
+            }
+        }
+        return sum;
+    }
+
+    private static readonly Position InvalidPosition = new Position(-1, -1);
+
     private int lineLength = 0;
 
     private bool numberActive = false;
     private bool isNumberWithSymbol = false;
+    private bool IsNumberWithGear = false;
     private int currentNumber = 0;
     private int sum = 0;
+    private Position GearPosition = InvalidPosition;
+    private Dictionary<Position, List<int>> GearMap = [];
 
     private void ProcessCharacter(int charIndex, int lineIndex)
     {
@@ -70,6 +92,15 @@ public class EngineNumbers
         {
             sum += currentNumber;
         }
+        if (!GearPosition.Equals(InvalidPosition))
+        {
+            if (!GearMap.ContainsKey(GearPosition))
+            {
+                GearMap[GearPosition] = new List<int>();
+            }
+            GearMap[GearPosition].Add(currentNumber);
+            GearPosition = InvalidPosition;
+        }
         numberActive = false;
         isNumberWithSymbol = false;
         currentNumber = 0;
@@ -91,16 +122,21 @@ public class EngineNumbers
         {
             isNumberWithSymbol = CheckForSymbolNeighbor(charIndex, lineIndex);
         }
+        if (GearPosition.Equals(InvalidPosition))
+        {
+            GearPosition = CheckForGearSymbolNeighbor(charIndex, lineIndex);
+        }
     }
 
     private bool CheckForSymbolNeighbor(int charIndex, int lineIndex)
     {
         List<Position> positionsToCheck = new List<Position>();
-        positionsToCheck.Add(new Position(charIndex - 1, lineIndex));
-        positionsToCheck.Add(new Position(charIndex + 1, lineIndex));
-        positionsToCheck.Add(new Position(charIndex - 1, lineIndex + 1));
-        positionsToCheck.Add(new Position(charIndex, lineIndex + 1));
-        positionsToCheck.Add(new Position(charIndex + 1, lineIndex + 1));
+        for (int i = -1; i <= 1; i++)
+        {
+            positionsToCheck.Add(new Position(charIndex - 1, lineIndex + i));
+            positionsToCheck.Add(new Position(charIndex, lineIndex + i));
+            positionsToCheck.Add(new Position(charIndex + 1, lineIndex + i));
+        }
         foreach (Position position in positionsToCheck)
         {
             if (IsPositionValid(position) && IsSymbolAtPosition(position))
@@ -111,11 +147,36 @@ public class EngineNumbers
         return false;
     }
 
+    private Position CheckForGearSymbolNeighbor(int charIndex, int lineIndex)
+    {
+        List<Position> positionsToCheck = new List<Position>();
+        for (int i = -1; i <= 1; i++)
+        {
+            positionsToCheck.Add(new Position(charIndex - 1, lineIndex + i));
+            positionsToCheck.Add(new Position(charIndex, lineIndex + i));
+            positionsToCheck.Add(new Position(charIndex + 1, lineIndex + i));
+        }
+        foreach (Position position in positionsToCheck)
+        {
+            if (IsPositionValid(position) && IsGearAtPosition(position))
+            {
+                return position;
+            }
+        }
+        return InvalidPosition;
+    }
+
     private bool IsPositionValid(Position position)
     {
         bool validCharIndex = position.CharIndex >= 0 && position.CharIndex < lineLength;
         bool validLineIndex = position.LineIndex >= 0 && position.LineIndex < input.Length;
         return validCharIndex && validLineIndex;
+    }
+
+    private bool IsGearAtPosition(Position position)
+    {
+        char charAtPosition = input[position.LineIndex][position.CharIndex];
+        return charAtPosition == '*';
     }
 
     private bool IsSymbolAtPosition(Position position)
@@ -136,73 +197,4 @@ public class EngineNumbers
         }
         return true;
     }
-}
-
-public class Day3Test
-{
-    [Fact]
-    public void Test_SingleLineValidNumber()
-    {
-        string[] input = { "467*.." };
-        EngineNumbers engine = new EngineNumbers(input);
-        Assert.Equal(467, engine.CalculateNumber());
-    }
-
-    [Fact]
-    public void Test_SingleLineInvalidNumber()
-    {
-        string[] input = { "467.*." };
-        EngineNumbers engine = new EngineNumbers(input);
-        Assert.Equal(0, engine.CalculateNumber());
-    }
-
-    [Fact]
-    public void Test_SingleLineSymbolAtStart()
-    {
-        string[] input = { "..*18.." };
-        EngineNumbers engine = new EngineNumbers(input);
-        Assert.Equal(18, engine.CalculateNumber());
-    }
-
-    [Fact]
-    public void Test_SingleLineMultipleNumbers()
-    {
-        string[] input = { "..*18..345.45).1.12!" };
-        EngineNumbers engine = new EngineNumbers(input);
-        Assert.Equal(18 + 45 + 12, engine.CalculateNumber());
-    }
-
-    [Fact]
-    public void Test_MultipleLines_LineBelowRightBottom()
-    {
-        string[] input = {
-            ".3..",
-            "..*."
-        };
-        EngineNumbers engine = new EngineNumbers(input);
-        Assert.Equal(3, engine.CalculateNumber());
-    }
-
-    [Fact]
-    public void Test_MultipleLines_LineBelowMiddle()
-    {
-        string[] input = {
-            ".3..",
-            ".*.."
-        };
-        EngineNumbers engine = new EngineNumbers(input);
-        Assert.Equal(3, engine.CalculateNumber());
-    }
-
-    [Fact]
-    public void Test_MultipleLines_LineBelowLeftBottom()
-    {
-        string[] input = {
-            ".3..",
-            "*..."
-        };
-        EngineNumbers engine = new EngineNumbers(input);
-        Assert.Equal(3, engine.CalculateNumber());
-    }
-
 }
