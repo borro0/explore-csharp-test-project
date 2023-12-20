@@ -42,6 +42,7 @@ public class EngineNumbers
             {
                 ProcessCharacter(charIndex, lineIndex);
             }
+            ProcessNonDigit(); // to close of the current line
         }
         int sum = 0;
         foreach ((Position position, List<int> numbers) in GearMap) {
@@ -58,7 +59,6 @@ public class EngineNumbers
 
     private bool numberActive = false;
     private bool isNumberWithSymbol = false;
-    private bool IsNumberWithGear = false;
     private int currentNumber = 0;
     private int sum = 0;
     private Position GearPosition = InvalidPosition;
