@@ -8,49 +8,72 @@ public class SeedMapper
         this.input = input;
     }
 
-    public long GetLowestMappedSeed()
+    public long GetLowestMappedSeedRangeStyle()
     {
-        // seeds: 79 55
-        // 
-        // seed-to-soil map:
-        // 50 98 2
-        // 52 50 48
+        string[] seeds_parts = input[0].Split(": ");
+        List<long> seed_range_pairs = ParseNumbers(seeds_parts[1]);
+        List<long> seeds = new List<long>();
+        for (int i = 0; i < seeds.Count; i += 2)
+        {
+
+        }
+    }
+
+    public long GetLowestMappedSeedNormal()
+    {
         string[] seeds_parts = input[0].Split(": ");
         List<long> seeds = ParseNumbers(seeds_parts[1]);
+        return GetLowestMappedSeed(seeds);
+    }
+
+    private long GetLowestMappedSeed(List<long> seeds)
+    {
         List<string> mapString = new List<string>();
         bool isMapActive = false;
 
-        for (int i = 2; i < input.Length; i++) {
-            if (input[i].Contains("map")) {
-            } else if (input[i].Length == 0) {
+        for (int i = 2; i < input.Length; i++)
+        {
+            if (input[i].Contains("map"))
+            {
+            }
+            else if (input[i].Length == 0)
+            {
                 seeds = MapSeeds(seeds, mapString);
                 mapString.Clear();
                 isMapActive = false;
-            } else {
+            }
+            else
+            {
                 mapString.Add(input[i]);
                 isMapActive = true;
             }
         }
 
-        if (isMapActive) {
+        if (isMapActive)
+        {
             seeds = MapSeeds(seeds, mapString);
         }
 
         return seeds.Min();
     }
 
-    public List<long> MapSeeds(List<long> seeds, List<string> map_strings) {
+    public List<long> MapSeeds(List<long> seeds, List<string> map_strings)
+    {
         List<List<long>> mapFunctions = new List<List<long>>();
         List<long> mappedValues = new List<long>();
-        foreach(string map in map_strings) {
+        foreach (string map in map_strings)
+        {
             mapFunctions.Add(ParseNumbers(map));
         }
-        foreach (long seed in seeds) {
+        foreach (long seed in seeds)
+        {
             bool isMapped = false;
-            foreach(List<long> map_function in mapFunctions) {
+            foreach (List<long> map_function in mapFunctions)
+            {
                 long source_start = map_function[1];
                 long range = map_function[2];
-                if (seed >= source_start && seed <= source_start + range) {
+                if (seed >= source_start && seed <= source_start + range)
+                {
                     long destination_start = map_function[0];
                     long mapped_value = seed - source_start + destination_start;
                     mappedValues.Add(mapped_value);
@@ -58,7 +81,8 @@ public class SeedMapper
                     break;
                 }
             }
-            if (!isMapped) {
+            if (!isMapped)
+            {
                 mappedValues.Add(seed);
             }
         }

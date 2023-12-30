@@ -13,7 +13,7 @@ public class Day5Test
             "52 50 48",
         };
         SeedMapper seedMapper = new SeedMapper(input);
-        long result = seedMapper.GetLowestMappedSeed();
+        long result = seedMapper.GetLowestMappedSeedNormal();
         Assert.Equal(57, result);
     }
 
@@ -28,7 +28,7 @@ public class Day5Test
             "52 50 48",
         };
         SeedMapper seedMapper = new SeedMapper(input);
-        long result = seedMapper.GetLowestMappedSeed();
+        long result = seedMapper.GetLowestMappedSeedNormal();
         Assert.Equal(13, result);
     }
 
@@ -44,7 +44,7 @@ public class Day5Test
             "52 50 48",
         };
         SeedMapper seedMapper = new SeedMapper(input);
-        long result = seedMapper.GetLowestMappedSeed();
+        long result = seedMapper.GetLowestMappedSeedNormal();
         Assert.Equal(57, result);
     }
 
@@ -64,7 +64,7 @@ public class Day5Test
             "39 0 15",
         };
         SeedMapper seedMapper = new SeedMapper(input);
-        long result = seedMapper.GetLowestMappedSeed();
+        long result = seedMapper.GetLowestMappedSeedNormal();
         Assert.Equal(52, result);
     }
 
@@ -75,7 +75,7 @@ public class Day5Test
         string input_file_path = @"C:\Users\bblokland\explore-csharp-test-project\ExploreCSharpTestProject\day5\input.txt";
         string[] input = File.ReadAllLines(input_file_path);
         SeedMapper seedMapper = new SeedMapper(input);
-        long result = seedMapper.GetLowestMappedSeed();
+        long result = seedMapper.GetLowestMappedSeedNormal();
         Console.WriteLine($"result: {result}");
     }
 }
