@@ -1,5 +1,9 @@
 namespace ExploreCSharpTestProject;
 
+public record MapFunction(long DestinationStart, long SourceStart, long Range);
+
+public record Range(long Start, long Length);
+
 public class SeedMapper
 {
     private string[] input;
@@ -8,15 +12,21 @@ public class SeedMapper
         this.input = input;
     }
 
+    static public List<Range> MapRange(Range range, List<MapFunction> map_functions)
+    {
+        return new List<Range> { range };
+    }
+
     public long GetLowestMappedSeedRangeStyle()
     {
         string[] seeds_parts = input[0].Split(": ");
         List<long> seed_range_pairs = ParseNumbers(seeds_parts[1]);
-        List<long> seeds = new List<long>();
-        for (int i = 0; i < seeds.Count; i += 2)
+        List<Range> seed_ranges = new List<Range>();
+        for (long i = 0; i < seed_range_pairs.Count; i += 2)
         {
 
         }
+        return 0;
     }
 
     public long GetLowestMappedSeedNormal()
@@ -31,7 +41,7 @@ public class SeedMapper
         List<string> mapString = new List<string>();
         bool isMapActive = false;
 
-        for (int i = 2; i < input.Length; i++)
+        for (long i = 2; i < input.Length; i++)
         {
             if (input[i].Contains("map"))
             {
