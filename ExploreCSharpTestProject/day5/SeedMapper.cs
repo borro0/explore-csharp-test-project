@@ -1,8 +1,6 @@
+using System;
+
 namespace ExploreCSharpTestProject;
-
-public record MapFunction(long DestinationStart, long SourceStart, long Range);
-
-public record Range(long Start, long Length);
 
 public class SeedMapper
 {
@@ -12,21 +10,55 @@ public class SeedMapper
         this.input = input;
     }
 
-    static public List<Range> MapRange(Range range, List<MapFunction> map_functions)
-    {
-        return new List<Range> { range };
-    }
-
     public long GetLowestMappedSeedRangeStyle()
     {
         string[] seeds_parts = input[0].Split(": ");
         List<long> seed_range_pairs = ParseNumbers(seeds_parts[1]);
         List<Range> seed_ranges = new List<Range>();
-        for (long i = 0; i < seed_range_pairs.Count; i += 2)
+        for (int i = 0; i < seed_range_pairs.Count; i += 2)
         {
-
+            seed_ranges.Add(new Range(seed_range_pairs[i], seed_range_pairs[i + 1]));
         }
-        return 0;
+        List<MapFunction> mapFunctions = new List<MapFunction>();
+        bool isMapActive = false;
+
+        for (long i = 2; i < input.Length; i++)
+        {
+            if (input[i].Contains("map"))
+            {
+            }
+            else if (input[i].Length == 0)
+            {
+                RangeTransformer rangeTransformer = new RangeTransformer(mapFunctions);
+                seed_ranges = rangeTransformer.Transform(seed_ranges);
+                mapFunctions.Clear();
+                isMapActive = false;
+            }
+            else
+            {
+                List<long> mapFunctionNumbers = ParseNumbers(input[i]);
+                MapFunction mapFunction = new MapFunction(mapFunctionNumbers[0], mapFunctionNumbers[1], mapFunctionNumbers[2]);
+                mapFunctions.Add(mapFunction);
+                isMapActive = true;
+            }
+        }
+
+        if (isMapActive)
+        {
+            RangeTransformer rangeTransformer = new RangeTransformer(mapFunctions);
+            seed_ranges = rangeTransformer.Transform(seed_ranges);
+        }
+
+        Range lowestRange = new Range(long.MaxValue, 0);
+        foreach(Range range in seed_ranges)
+        {
+            if (range.Start < lowestRange.Start)
+            {
+                lowestRange = range;
+            }
+        }
+
+        return lowestRange.Start;
     }
 
     public long GetLowestMappedSeedNormal()
